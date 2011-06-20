@@ -140,7 +140,7 @@ namespace Penjin
                 return (pos + Vector2d<float>(region.x,region.y));
             else return pos;
         }
-        float getWidth(CRbool withRegion=true) const
+        int getWidth(CRbool withRegion=true) const
         {
             if (withRegion && region.w != 0)
                 return region.w;
@@ -149,7 +149,7 @@ namespace Penjin
             else
                 return 0;
         }
-        float getHeight(CRbool withRegion=true) const
+        int getHeight(CRbool withRegion=true) const
         {
             if (withRegion && region.h != 0)
                 return region.h;
@@ -200,20 +200,20 @@ namespace Penjin
         {
             pos += value;
         }
-        void setWidth(CRfloat value)
+        void setWidth(CRint value)
         {
             region.w = value;
         }
-        void setHeight(CRfloat value)
+        void setHeight(CRint value)
         {
             region.h = value;
         }
-        void setSize(const Vector2d<float> &value)
+        void setSize(const Vector2d<int> &value)
         {
             region.w = value.x;
             region.h = value.y;
         }
-        void setSize(CRfloat w, CRfloat h)
+        void setSize(CRint w, CRint h)
         {
             region.w = w;
             region.h = h;
@@ -237,7 +237,7 @@ namespace Penjin
          * \param fullShape : If true, the image data is tested pixel by pixel, otherwise Rectangles are used. Default to false.
          * \return CollisionInfo containing position, type and direction of collision and if indeed a collision took place.
          */
-        CollisionInfo hitTest(const Vector2d<int>& testPoint, CRbool fullShape=false);
+        CollisionInfo hitTest(const Vector2d<float>& testPoint, CRbool fullShape=false);
 
         // returns the colour of the collision image at position x,y or checks against the region if no image has been loaded
         // absulute = true - the passed point is relative to the logic zero-point (for example the top-left corner of the screen)
@@ -255,7 +255,7 @@ namespace Penjin
         // also works when one or both have no collision image or region loaded
         bool hitTest(const CollisionRegion* const tester, CRbool fullShape=false) const;
         // use external positioning
-        bool hitTest(const CollisionRegion* const tester, const Vector2d <float> & PosObj, const Vector2d<float>& PosTester, CRbool fullShape=false) const;
+        bool hitTest(const CollisionRegion* const tester, const Vector2d<float>& PosObj, const Vector2d<float>& PosTester, CRbool fullShape=false) const;
         // performs a hitTest first and a (rectangular) check for direction afterwards
         // returns the result of that check (only 4 base directions, no corners, viewed from this object)
         // might fail on extreme shapes (e.g. very tall and very thin)
@@ -277,7 +277,7 @@ namespace Penjin
 
         struct RECT
         {
-            float x, y, w, h;
+            int x, y, w, h;
         };
 
         RECT region; // x,y values are offset of the generated region and cannot be set by the user
