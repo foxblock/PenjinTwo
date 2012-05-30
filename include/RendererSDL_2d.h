@@ -1,21 +1,21 @@
 /**
     \section LICENSE
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 /***************************************************************************************************
 *   \file RendererSDL_2d is a 2d renderer using SDL.
@@ -29,14 +29,15 @@
 
 namespace Penjin
 {
+    class Surface;
+    class Rectangle;
+
     class RendererSDL_2d : public Renderer
     {
         public:
+            //static RendererSDL_2d* getInstance();
             /** Default constructor */
             RendererSDL_2d();
-            /** Default destructor */
-            virtual ~RendererSDL_2d();
-
             /** \brief Choose whether to show the cursor or not.
              * \param show : whill show the cursor if set to true, false will hide the cursor.
              */
@@ -78,9 +79,16 @@ namespace Penjin
 
 
             virtual Colour getPixel(Vector2d<int> pos);
-            virtual Colour getPixel(Surface s, Vector2d<int> pos);
+            virtual Colour getPixel(Surface* s, Vector2d<int> pos);
 
+            virtual Surface* scale(Surface* surface,const float& scale);
 
+            /** \brief SmoothScales a Surface based on an integer scale factor (Not intended for realtime...)
+             * \param surface : The Surface image source to scale.
+             * \param scale : The integer scale factor.
+             * \return The scale Surface.
+             */
+            virtual Surface* pokeScale(Surface* surface, const int& scale);
 
             virtual void showVideoInfo();
 
@@ -92,10 +100,21 @@ namespace Penjin
             void lockSurface(SDL_Surface* s);
             void unlockSurface(SDL_Surface* s);
 
+        protected:
+
+            /** Default destructor */
+            virtual ~RendererSDL_2d();
         private:
+            // Used in PokeScale
+            Rectangle findLeftSlope(const Vector2d<int>& px, Surface* in);
+            Rectangle findRightSlope(const Vector2d<int>& px, Surface* in);
+            void drawSlopes(const Rectangle& L, const Rectangle& R, const int& scale, Surface* out);
+
             SDL_Surface* screen;
+
+            //static RendererSDL_2d* instance;
     };
 
-typedef Singleton <RendererSDL_2d> GFX;
+    //typedef Singleton<RendererSDL_2d> GFX;
 }
 #endif // RENDERERSDL_2D_H

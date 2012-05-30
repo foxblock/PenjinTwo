@@ -1,21 +1,21 @@
 /**
     \section LICENSE
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 **********************************************************************************************/
 /**
   * \file WindowManager is a simple WindowManager to handle several instances of Window
@@ -23,7 +23,7 @@
 */
 #ifndef WINDOWMANAGER_H
 #define WINDOWMANAGER_H
-#include "Singleton.h"
+//#include "Singleton.h"
 #include "RenderObject.h"
 #include "UpdateObject.h"
 #include <vector>
@@ -39,6 +39,8 @@ namespace Penjin
             WindowManager();
             /** Default destructor */
             virtual ~WindowManager();
+
+            WindowManager* getInstance();
 
             /** \brief Render the relevent Window instances to the screen.*/
             virtual void render();
@@ -60,7 +62,10 @@ namespace Penjin
 
         protected:
             vector<Window*> windows;
+        private:
+            static WindowManager* instance;
     };
-    typedef Singleton<WindowManager> WinMan;
+    //typedef Singleton<WindowManager> WinMan;
+    typedef WindowManager WinMan;
 }
 #endif // WINDOWMANAGER_H

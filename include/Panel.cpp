@@ -1,20 +1,20 @@
 /*-
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "GFX.h"
 #include "SimpleJoy.h"
@@ -27,13 +27,13 @@ using Penjin::Panel;
 using Penjin::Vector2d;
 using Penjin::Widget;
 using Penjin::Line;
-Panel::Panel() : shouldHide(false), hidden(false), selection(-1)//, hideOffset(0)
+Panel::Panel() : shouldHide(false), hidden(false), selection(-1), padSelection(-1)//, hideOffset(0)
 {
     //ctor
     //setColour(DARK_GREY);
-    Vector2d<int> t = Penjin::GFX::getInstance()->getResolution();
-    t.y = 32;//t.y * 0.18f;
-    t.x = t.x -1;
+    Vector2d<int> t;
+    t.y = 32;
+    t.x = GFX->getWidth() -1;
     setDimensions(t);
     lowLight->setColour(BLACK);
     highLight->setColour(LIGHT_GREY);
@@ -76,23 +76,27 @@ void Panel::render()
 void Panel::update()
 {
     // first we find out if the panel is near top or bottom of screen
-    int centre = Penjin::GFX::getInstance()->getHeight() * 0.5f;
-    int boxCentre = ( startPosition.y + dimensions.y) * 0.5f;
+    int centre = Penjin::GFX->getHeight() * 0.5f;
+    Vector2d<int> dim = getScaledDimensions();
+    Vector2d<int> pos = getScaledPosition();
+    Vector2d<int> startPos = startPosition.getScaledPosition();
+
+    int boxCentre = ( startPos.y + dim.y) * 0.5f;
 
     // nearer top of screen
     if(boxCentre<centre)
     {
         if(shouldHide)
         {
-            if(Rectangle::position.y >= startPosition.y - dimensions.y)
-                --Rectangle::position.y;
+            if(pos.y >= startPos.y - dim.y)
+                Rectangle::setPosition(Vector2d<float>(position.x,position.y-1));
             else
                 hidden = true;
         }
         else
         {
-            if(Rectangle::position.y  < startPosition.y)
-                ++Rectangle::position.y;
+            if(pos.y  < startPos.y)
+                Rectangle::setPosition(Vector2d<float>(position.x,position.y+1));
             else
                 hidden = false;
         }
@@ -104,19 +108,23 @@ void Panel::update()
 
 
     // Now position the widgets
-    Vector2d<float> t = Rectangle::position;
+    Vector2d<float> t = Rectangle::getScaledPosition();
     for(unsigned int i = 0; i < widgets.size(); ++i)
     {
-        // resize panel if a wdiget is too big
+        // resize panel if a widget is too big
         if(widgets.at(i)->getDimensions() > getDimensions())
-            setDimensions(widgets.at(i)->getDimensions());
-
-        int wCentre = widgets.at(i)->getDimensions().y*0.5f;
-        int offset = (boxCentre -wCentre) +1;
+        {
+            setHeight(widgets.at(i)->getHeight());
+            setWidth(GFX->getWidth());
+        }
+        int wCentre = widgets.at(i)->getScaledDimensions().y*0.5f;
+        Vector2d<float> pixScale = GFX->getPixelScale();
+        int offset = (boxCentre -wCentre) + pixScale.x;
         t.x += offset;
-        t.y = offset + position.y;
-        widgets.at(i)->setPosition(t.x,t.y);
-        t.x += widgets.at(i)->getDimensions().x;
+        t.y = offset + getScaledPosition().y;
+
+        widgets.at(i)->setPosition(t.x/pixScale.x,t.y/pixScale.y);
+        t.x += widgets.at(i)->getScaledDimensions().x;
         widgets.at(i)->setSelected(false);
         widgets.at(i)->setActive(false);
     }
@@ -125,14 +133,24 @@ void Panel::update()
         widgets.at(selection)->setSelected(true);
     else
         selection = -1;
+
+    if(padSelection > -1 && padSelection < (int)widgets.size())
+        widgets.at(padSelection)->setSelected(true);
+    else
+        padSelection = -1;
 }
 
-void Panel::selectionConfirm()
+int Panel::selectionConfirm()
 {
-    if(selection > -1 && selection < (int)widgets.size())
-        widgets.at(selection)->setActive(true);
+    if(padSelection > -1 && padSelection < (int)widgets.size())
+    {
+        widgets.at(padSelection)->setSelected(true);
+        widgets.at(padSelection)->setActive(true);
+    }
     else
-        selection = -1;
+        padSelection = -1;
+
+    return padSelection;
 }
 
 int Panel::whichWidget()
@@ -176,10 +194,10 @@ void Panel::setShouldHide(const bool& hide)
 
 void Panel::selectionNext()
 {
-    ++selection;
+    ++padSelection;
 }
 
 void Panel::selectionPrevious()
 {
-    --selection;
+    --padSelection;
 }

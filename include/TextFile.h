@@ -1,20 +1,20 @@
 /*
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #ifndef TEXTDOC_H
 #define TEXTDOC_H
@@ -51,9 +51,9 @@ namespace Penjin
             void editLine(CRint line, CRstring newData);//	replace a line of data with new data
             string getLine(CRint line);				//	get the string data of the line
             void viewDoc();							//	View an outline of the doc
-            void clear();							//	Clear data out of doc.
+            virtual void clear();							//	Clear data out of doc.
             void append(CRstring data);				//	adds a string to the document
-        private:
+        protected:
             int findLine(CRstring target);
             vector <string> docData;
     };

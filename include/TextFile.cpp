@@ -1,25 +1,24 @@
 /*
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "TextFile.h"
-#include "ErrorHandler.h"
+//#include "ErrorHandler.h"
 using Penjin::TextFile;
-using Penjin::ErrorHandler;
 
 void TextFile::append(CRstring data)
 {
@@ -58,6 +57,7 @@ Penjin::ERRORS TextFile::load(const vector<string>& lines)
 
 Penjin::ERRORS TextFile::load(CRstring file)
 {
+    //ErrorHandler* eMan = ErrorMan::getInstance();
     #if defined (PLATFORM_WII)
         FILE *f = fopen ((Penjin::getWorkingDirectory() + file).c_str(), "rb");
         // can't find file
@@ -87,32 +87,32 @@ Penjin::ERRORS TextFile::load(CRstring file)
 
         if(!ifile.is_open())
         {
+            //eMan->print(PENJIN_FILE_NOT_FOUND, "TextFile: " + file);
             return PENJIN_FILE_NOT_FOUND;
         }
 
         clear();
 
         string temp = "NULL";
-        vector <string> tStrings;
         while(ifile.good())
         {
             getline(ifile,temp);
-            temp+="\n";
-            if(temp == "\n")
-                break;
             docData.push_back(temp);
         }
         if(ifile.is_open())
         {
             ifile.close();
+            fileName = file;
             return PENJIN_OK;
         }
+        //eMan->print(PENJIN_ERROR, "TextFile::load");
         return PENJIN_ERROR;
     #endif
 }
 
 Penjin::ERRORS TextFile::save(CRstring file)
 {
+    //ErrorHandler* eMan = ErrorMan::getInstance();
     #if defined(PLATFORM_WII)
         FILE *f = fopen ((Penjin::getWorkingDirectory() + file).c_str(), "wb");
         if (f == NULL)
@@ -135,6 +135,7 @@ Penjin::ERRORS TextFile::save(CRstring file)
         ofstream ofile(file.c_str());//save ofile
         if(!ofile.is_open())
         {
+            //eMan->print(PENJIN_UNABLE_TO_SAVE, "TextFile: " + file);
             return PENJIN_UNABLE_TO_SAVE;
         }
         size_t size = docData.size();
@@ -150,8 +151,10 @@ Penjin::ERRORS TextFile::save(CRstring file)
         if(ofile.is_open())
         {
             ofile.close();
+            fileName = file;
             return PENJIN_OK;
         }
+        //eMan->print(PENJIN_ERROR, "TextFile::save");
         return PENJIN_ERROR;
 	#endif
 }
@@ -160,7 +163,7 @@ string TextFile::getLine(CRint line)
 {
 	if(line<(int)docData.size())
 		return docData[line];
-	return ErrorHandler().getErrorText("PENJIN_INVALID_INDEX");
+	return "PENJIN_INVALID_INDEX";
 }
 
 void TextFile::search(CRstring target)

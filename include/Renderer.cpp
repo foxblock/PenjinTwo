@@ -1,20 +1,20 @@
 /*
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Renderer.h"
 #include "Timer.h"
@@ -29,6 +29,7 @@ scaleMode(smNONE)
     //ctor
     timer = new Timer;
     setFrameRate(fps);
+    pixelScale.x = pixelScale.y = 1;
 }
 
 Renderer::~Renderer()
@@ -89,7 +90,7 @@ Vector2d<int> Renderer::getResolution()
 
 void Renderer::setBaseResolution(const Vector2d<int>& r)
 {
-    if(r.x == 0 || r.y == 0)
+    if(r.x == 0 || r.y == 0 || r.x == resolution.x || r.y == resolution.y)
         return;
     baseResolution = r;
     pixelScale.x = (float)resolution.x / (float)r.x;
@@ -99,7 +100,7 @@ void Renderer::setBaseResolution(const Vector2d<int>& r)
 
 void Renderer::setBaseWidth(const int& w)
 {
-    if(w == 0)
+    if(w == 0 || w == resolution.x)
         return;
     baseResolution.x = w;
     pixelScale.x = (float)resolution.x / (float)w;
@@ -108,7 +109,7 @@ void Renderer::setBaseWidth(const int& w)
 
 void Renderer::setBaseHeight(const int& h)
 {
-    if(h == 0)
+    if(h == 0 || h == resolution.y)
         return;
     baseResolution.y = h;
     pixelScale.y = (float)resolution.y / (float)h;
@@ -146,7 +147,9 @@ void Renderer::frameLimiter()
 void Renderer::queueRenderObject(RenderObject* obj)
 {
     if(obj)
+    {
         rendObjs.push_back(obj);
+    }
 }
 
 void Renderer::renderQueue()

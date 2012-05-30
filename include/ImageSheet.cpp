@@ -1,27 +1,29 @@
 /**
     \section LICENSE
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 **********************************************************************************************/
 /**
   * \file A class which handles loading tilesheets
   * \author Kevin Winfield-Pantoja
 */
 #include "ImageSheet.h"
+#include "ErrorHandler.h"
+#include "StringUtility.h"
 using Penjin::ImageSheet;
 
 ImageSheet::ImageSheet() : sheetMode(true), activeImage(0)
@@ -29,6 +31,7 @@ ImageSheet::ImageSheet() : sheetMode(true), activeImage(0)
     //ctor
     setDrawWidth(1);
     setColour(MAGENTA);
+    fileName = "IMAGESHEET";
 }
 
 ImageSheet::~ImageSheet()
@@ -66,7 +69,12 @@ Penjin::ERRORS ImageSheet::load(SDL_Surface* s, CRuint xTiles, CRuint yTiles)
 
     // if there's problems we jump out.
     if(e != PENJIN_OK)
+    {
+        ErrorMan::getInstance()->print(e, "ImageSheet: " + fileName + "xTiles: " + StringUtility::intToString(xTiles) + "yTiles: " + StringUtility::intToString(yTiles));
         return e;
+    }
+
+
     // assign clipping areas for this sheet
     return assignClipAreas(xTiles,yTiles,0,0);
 }
@@ -79,6 +87,7 @@ Penjin::ERRORS ImageSheet::load(CRstring file, CRuint xTiles, CRuint yTiles)
     // Get out if there's a problem
     if(e != PENJIN_OK)
         return e;
+
     // finally assign the clipping areas
     return assignClipAreas(xTiles,yTiles,0,0);
 }
@@ -135,7 +144,7 @@ void ImageSheet::render()
 
             dst.x = position.x;
             dst.y = position.y;
-            SDL_BlitSurface(surface, &clipAreas.at(activeImage), GFX::getInstance()->getSDLVideoSurface(), &dst);
+            SDL_BlitSurface(surface, &clipAreas.at(activeImage), GFX_SDL_2D::getInstance()->getSDLVideoSurface(), &dst);
         }
     }
     else
@@ -150,14 +159,14 @@ void ImageSheet::render()
 
         dst.x = position.x;
         dst.y = position.y;
-        SDL_BlitSurface(surfaces.at(activeImage), &src, GFX::getInstance()->getSDLVideoSurface(), &dst);
+        SDL_BlitSurface(surfaces.at(activeImage), &src, GFX_SDL_2D::getInstance()->getSDLVideoSurface(), &dst);
     }
     #ifdef _DEBUG
         // We only want to render the Rectangle to the size of one subImage
         Vector2d<int> t = getDimensions(activeImage);
-        GFX::getInstance()->setDrawColour(*this);
-        GFX::getInstance()->setDrawWidth(drawWidth);
-        GFX::getInstance()->drawRectangle(position, t);
+        GFX->setDrawColour(*this);
+        GFX->setDrawWidth(drawWidth);
+        GFX->drawRectangle(position, t);
     #endif
 }
 
@@ -225,8 +234,12 @@ size_t ImageSheet::size()
 
 Penjin::Colour ImageSheet::getPixelInFrame(Vector2d<int> pos, CRint frame) const
 {
+    #ifdef PENJIN_SDL
     if (sheetMode)
-        return Penjin::GFX::getInstance()->getPixel(surface, Vector2d<int> (pos.x + clipAreas[frame].x, pos.y + clipAreas[frame].y) );
+        return Penjin::GFX_SDL_2D::getInstance()->getPixel(surface, Vector2d<int> (pos.x + clipAreas[frame].x, pos.y + clipAreas[frame].y) );
 
-    return Penjin::GFX::getInstance()->getPixel(surfaces.at(frame), Vector2d<int> (pos.x, pos.y ) );
+    return Penjin::GFX_SDL_2D::getInstance()->getPixel(surfaces.at(frame), Vector2d<int> (pos.x, pos.y ) );
+    #else
+    /// TODO: Write GL alternative
+    #endif
 }

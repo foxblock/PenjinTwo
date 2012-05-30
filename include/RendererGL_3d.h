@@ -1,5 +1,5 @@
 /**
-    \section LICENSE
+	\section LICENSE
 	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
 
 	This file is part of Penjin.
@@ -17,32 +17,31 @@
 	You should have received a copy of the GNU Lesser General Public License
 	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
 */
-/**
-  * \file Game2d is a base class for creating a 2d based game.
-  * \author Kevin Winfield-Pantoja
-  */
-#ifndef GAME2D_H
-#define GAME2D_H
+/***************************************************************************************************
+*   \file CLASS_NAME is INSERT DESCRIPTION
+*   \author Kevin Winfield-Pantoja
+*/
 
-#include "Application.h"
+#ifndef RENDERERGL_3D_H
+#define RENDERERGL_3D_H
+
+#if defined (PENJIN_GL) || defined (PENJIN_ES) || defined (PENJIN_ES2)
+
+#include "RendererGL_2d.h"
 
 namespace Penjin
 {
-    class Game2d : public Application
+    class RendererGL_3d : public RendererGL_2d
     {
         public:
+            static RendererGL_3d* getInstance();
             /** Default constructor */
-            Game2d();
+            RendererGL_3d();
             /** Default destructor */
-            virtual ~Game2d();
-
-            //virtual void update()=0;
-            virtual void loop();    /**< The main game loop */
+            virtual ~RendererGL_3d();
         protected:
-            /** \brief Attempts to load the config file from the default location.
-             * \return The error in trying to load the config file
-             */
-            Penjin::ERRORS loadConfig();
+        private:
     };
 }
-#endif // GAME2D_H
+#endif  //  GL or ES or ES2 only
+#endif // RENDERERGL_3D_H

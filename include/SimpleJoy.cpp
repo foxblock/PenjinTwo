@@ -1,20 +1,20 @@
 /*
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "SimpleJoy.h"
 
@@ -22,6 +22,8 @@
 #include "ErrorHandler.h"
 
 using Penjin::SimpleJoy;
+
+//SimpleJoy* SimpleJoy::instance = NULL;
 
 SimpleJoy::~SimpleJoy()
 {
@@ -131,6 +133,15 @@ SimpleJoy::SimpleJoy()
     joystickStatus();
 #endif
 }
+
+/*SimpleJoy* SimpleJoy::getInstance()
+{
+    if( instance == NULL )
+    {
+        instance = new SimpleJoy;
+    }
+    return instance;
+}*/
 
 void SimpleJoy::update()
 {
@@ -579,10 +590,8 @@ void SimpleJoy::resetKeys()
 	clearEventQueue();
 
     players[player].Start=players[player].Select=players[player].Up=players[player].Down=players[player].Left=players[player].Right
-    =players[player].A=players[player].B=players[player].X=players[player].Y=players[player].L=players[player].R=sjRELEASED;
-    #ifdef PLATFORM_PC
-        players[player].Quit = sjRELEASED;
-    #endif
+    =players[player].A=players[player].B=players[player].X=players[player].Y=players[player].L=players[player].R=players[player].Quit = sjRELEASED;
+
     #if defined(PLATFORM_GP2X) || defined(PLATFORM_PC)
         players[player].VolumeUp=players[player].VolumeDown=players[player].Click=players[player].UpLeft=players[player].UpRight
         =players[player].DownLeft=players[player].DownRight=sjRELEASED;

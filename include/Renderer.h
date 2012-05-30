@@ -1,25 +1,25 @@
 /*
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "DimensionObject.h"
+//#include "DimensionObject.h"
 #include "Singleton.h"
 #include "Colour.h"
 #include "Surface.h"
@@ -32,9 +32,10 @@ namespace Penjin
 
     enum SCALE_MODES
     {
-        smNONE=0,       //  No scaling applied
-        smSCALE2x,      //  Scale2X filter applied before final blit
-        smPRESCALE      //  Objects resized on load. Positions and dimensions scaled.
+        smNONE=0,           //  No scaling applied
+        smSCALE2x,          //  Scale2X filter applied before final blit
+        smPRESCALE,         //  Objects resized on load. Positions and dimensions scaled.
+        smPOKESCALE,        //  Object prescaled using PokeScale smoothing
     };
 
     class Renderer
@@ -70,7 +71,7 @@ namespace Penjin
             virtual void drawEllipse(const Vector2d<float> & centre, const float& rx, const float& ry)=0;
 
             virtual Colour getPixel(Vector2d<int> pos)=0;
-            virtual Colour getPixel(Surface s, Vector2d<int> pos)=0;
+            virtual Colour getPixel(Surface* s, Vector2d<int> pos)=0;
 
             //virtual Surface cropSurface(Surface in, Rectangle cropArea)=0;
 
@@ -89,6 +90,9 @@ namespace Penjin
             void setBaseWidth(const int& w);
             void setBaseHeight(const int& h);
             Vector2d<float> getPixelScale();                    //  Gets the scale Vector of a single pixel.
+            virtual Surface* scale(Surface* surface, const float& scale)=0;
+            // Smooth scale a Surface based on an integer scale factor
+            virtual Surface* pokeScale(Surface* surface, const int& scale)=0;
 
         protected:
             int bpp;

@@ -1,23 +1,27 @@
 /*
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "LUT.h"
+#include <cmath>
 
+#ifndef PI
+    #define PI 3.141592654f
+#endif
 namespace LUT
 {
     /// Variables
@@ -59,33 +63,35 @@ void LUT::deInit()
     }
 }
 
-float LUT::Lsin(uchar angle)
+float LUT::Lsin(Brad angle)
 {
     //  Wrapping should be done automatically for us due to storage limits of uchar
-    if(angle > 128)
+    unsigned char t = angle.getAngle();
+    if(t > 128)
     {
-        angle-=128;
-        return -(sinCos[angle]);    //  Values are mirrored just negative so we just nagate
+        t-=128;
+        return -(sinCos[t]);    //  Values are mirrored just negative so we just nagate
     }
-    return sinCos[angle];
+    return sinCos[t];
 }
 
-float LUT::Lcos(CRuchar angle){return Lsin(angle+64);}
+float LUT::Lcos(Brad angle){return Lsin(angle+64u);}
 
-float LUT::Ltan(uchar angle)
+float LUT::Ltan(Brad angle)
 {
-    if(angle > 128)
+    if(angle > (unsigned char)128)
     {
-        angle-=128;
-        return -(tanTable[angle]);
+        angle-=(unsigned char)128;
+        return -(tanTable[angle.getAngle()]);
     }
-    return tanTable[angle];
+    return tanTable[angle.getAngle()];
 }
 
 /// Interpolated Trig functions
 //  CAUTION will not be accurate...
 float LUT::LIsin(float angle)
 {
+    angle = NumberUtility::wrapValue(angle,255.0f);
     float x1 = floor(angle*1000*ONE_OVER_PI);
     float y1 = Lsin(x1);
     float y2 = Lsin(x1+1);
@@ -94,6 +100,7 @@ float LUT::LIsin(float angle)
 
 float LUT::LIcos(float angle)
 {
+    angle = NumberUtility::wrapValue(angle,255.0f);
     float x1 = floor(angle*1000*ONE_OVER_PI);
     float y1 = Lcos(x1);
     float y2 = Lcos(x1+1);
@@ -102,6 +109,7 @@ float LUT::LIcos(float angle)
 
 float LUT::LItan(float angle)
 {
+    angle = NumberUtility::wrapValue(angle,255.0f);
     float x1 = floor(angle*1000*ONE_OVER_PI);
     float y1 = Ltan(x1);
     float y2 = Ltan(x1+1);

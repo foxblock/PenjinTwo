@@ -1,30 +1,31 @@
 /*
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "KeyMapper.h"
 #include "StringUtility.h"
+#include "ErrorHandler.h"
 using Penjin::KeyMapper;
 
 
 KeyMapper::KeyMapper()
 {
     //ctor
-    #ifdef PLATFORM_PC
+    #if defined (PLATFORM_PC) || defined (PLATFORM_PI)
         setFileName("config/input/pc.ini");
     #elif PLATFORM_PANDORA
         setFileName("config/input/pandora.ini");
@@ -32,6 +33,10 @@ KeyMapper::KeyMapper()
         setFileName("config/input/dingoo.ini");
     #elif PLATFORM_GP2X
         setFileName("config/input/gp2x.ini");
+    #elif PLATFORM_CAANOO
+        setFileName("config/input/caanoo.ini");
+    #elif PLATFORM_WIZ
+        setFileName("config/input/wiz.ini");
     #else
         setFileName("config/input/default.ini");
     #endif
@@ -58,13 +63,14 @@ void KeyMapper::clearKeys()
 Penjin::ERRORS KeyMapper::load(const vector<string>& lines)
 {
     //parse->loadCommandList(lines);
+    ErrorMan::getInstance()->print(PENJIN_FUNCTION_IS_STUB, "KeyMapper::load(const vector<string>& lines)");
     return Penjin::PENJIN_FUNCTION_IS_STUB;
 }
 
 Penjin::ERRORS KeyMapper::load(CRstring file)
 {
 
-    Penjin::ERRORS result = this->ConfigFile::load(file);
+    Penjin::ERRORS result = this->IniFile::load(file);
     if(result != PENJIN_OK)
     {
         defaultMap();
@@ -76,16 +82,20 @@ Penjin::ERRORS KeyMapper::load(CRstring file)
 
 Penjin::ERRORS KeyMapper::save(CRstring file)
 {
+    ErrorMan::getInstance()->print(PENJIN_FUNCTION_IS_STUB,"KeyMapper::save(CRstring file)");
     return Penjin::PENJIN_FUNCTION_IS_STUB;
 }
 
 void KeyMapper::defaultMap()
 {
+    #ifdef _DEBUG
+    ErrorMan::getInstance()->print("KeyMapper: Creating default mapping.");
+    #endif
     clearKeys();
     string device;
     string ID;
     string player= "1";
-#if defined(PLATFORM_PANDORA) || defined(PLATFORM_PC)
+#if defined(PLATFORM_PANDORA) || defined(PLATFORM_PC) || defined(PLATFORM_PI)
     device = "Keyboard";
     ID="0";
     setValue(device,"DeviceNumber",ID);
@@ -102,7 +112,7 @@ void KeyMapper::defaultMap()
         setValue(device,"MouseAxisY",        "1");
 #endif
 
-#ifdef PLATFORM_PC
+#if defined (PLATFORM_PC) || defined(PLATFORM_PI)
     device = "Keyboard";
         setValue(device,"A",        "x");
         setValue(device,"B",        "z");
@@ -112,21 +122,22 @@ void KeyMapper::defaultMap()
         setValue(device,"R",        "w");
         setValue(device,"Select",   "RightShift");
         setValue(device,"Start",    "Return");
-#elif PLATFORM_GP2X
+#elif defined(PLATFORM_GP2X) || defined(PLATFORM_WIZ)
+    // Wiz layout is same as gp2x.
     device = "Joystick";
     ID = "0";
     setValue(device,"DeviceNumber",ID);
     setValue(device,"Player", player);
         setValue(device,"Up",           "0");
         setValue(device,"UpLeft",       "1");
-        setValue(device,"Left",         "2")
+        setValue(device,"Left",         "2");
         setValue(device,"DownLeft",     "3");
         setValue(device,"Down",         "4");
         setValue(device,"DownRight",    "5");
         setValue(device,"Right",        "6");
         setValue(device,"UpRight",      "7");
         setValue(device,"Start",        "8");
-        setValue(device,"Select",       "9")
+        setValue(device,"Select",       "9");
         setValue(device,"L",            "10");
         setValue(device,"R",            "11");
         setValue(device,"A",            "12");
@@ -136,6 +147,39 @@ void KeyMapper::defaultMap()
         setValue(device,"VolumeUp",     "16");
         setValue(device,"VolumeDown",   "17");
         setValue(device,"Click",        "18");
+    device = "Mouse";
+    setValue(device,"DeviceNumber",ID);
+    setValue(device,"Player", player);
+        setValue(device,"LeftButton",   "0");
+        setValue(device,"MouseAxisX",        "0");
+        setValue(device,"MouseAxisY",        "1");
+#elif PLATFORM_CAANOO
+    device = "Joystick";
+    ID = "0";
+    setValue(device,"DeviceNumber",ID);
+    setValue(device,"Player", player);
+        setValue(device,"A",            "0");
+        setValue(device,"X",            "1");
+        setValue(device,"B",            "2");
+        setValue(device,"Y",            "3");
+        setValue(device,"L",            "4");
+        setValue(device,"R",            "5");
+        //setValue(device,"Menu",            "6");
+        setValue(device,"Start",        "8");
+        setValue(device,"Select",       "9");
+        setValue(device,"Click",        "10");
+    device="Joystick";
+    ID="0";
+    setValue(device,"Player", player);
+    setValue(device,"DeviceNumber",ID);
+        setValue(device,"LeftStickAxisX",   "0");
+        setValue(device,"LeftStickAxisY",   "1");
+    device = "Mouse";
+    setValue(device,"DeviceNumber",ID);
+    setValue(device,"Player", player);
+        setValue(device,"LeftButton",   "0");
+        setValue(device,"MouseAxisX",        "0");
+        setValue(device,"MouseAxisY",        "1");
 #elif PLATFORM_DINGOO
     device="Keyboard";
     ID="0";
@@ -212,7 +256,7 @@ EvilDragon: DPad works, that's Cursor Up, Down, Left, Right.
 #endif
     // parse through ini file and actually setup the keys
     applyMapping();
-    ConfigFile::save(fileName);
+    IniFile::save(fileName);
 }
 
 void KeyMapper::applyMapping()
@@ -253,6 +297,7 @@ Penjin::ERRORS KeyMapper::mapKey(CRuchar id)
         }
         else
         {
+            ErrorMan::getInstance()->print(PENJIN_ERROR, "KeyMapper::mapKey():");
             delete t;
             result = PENJIN_ERROR;  // We have to show that something went wrong with the config
         }
@@ -284,6 +329,7 @@ Penjin::ERRORS KeyMapper::mapMouse(CRuchar id)
         }
         else
         {
+            ErrorMan::getInstance()->print(PENJIN_ERROR, "KeyMapper::mapMouse(): ");
             delete t;
             result = PENJIN_ERROR;  // We have to show that something went wrong with the config
         }
@@ -326,6 +372,7 @@ Penjin::ERRORS KeyMapper::mapJoy(CRuchar id)
         }
         else
         {
+            ErrorMan::getInstance()->print(PENJIN_ERROR, "KeyMapper::mapJoy()");
             delete t;
             result = PENJIN_ERROR;  // We have to show that something went wrong with the config
         }

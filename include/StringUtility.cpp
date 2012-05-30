@@ -1,20 +1,20 @@
 /*
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "StringUtility.h"
 using namespace Penjin;
@@ -296,7 +296,41 @@ string StringUtility::lower(string word)
         word[i] = lower((char)word[i]);
     return word;
 }
+
 string StringUtility::leadingZero(CRint value){return (value<10?"0":"") + StringUtility::intToString(value);}
+
+string StringUtility::removeSpaces(string in)
+{
+    return substrReplace(in, " ", "");
+}
+
+string StringUtility::removeLeadingSpaces(string in)
+{
+    size_t found = in.npos;
+    for(size_t i = 0; i < in.size(); ++i)
+    {
+        if(in.at(i) == ' ')
+        {
+            in = in.substr(i+1,in.size()-1);
+        }
+        else
+            break;
+    }
+    return in;
+}
+
+string StringUtility::removeTrailingSpaces(string in)
+{
+    size_t found = in.npos;
+    for(int i = in.size()-1; i >= 0; --i)
+    {
+        if(in.at(i) == ' ')
+            in.erase(i);
+        else
+            break;
+    }
+    return in;
+}
 
 void StringUtility::reverse(char* s)
 {
@@ -323,7 +357,7 @@ string StringUtility::substrReplace(string text, CRstring oldSubstr, CRstring ne
 }
 
 /* This is basically the same thing as String.Split in .NET; it splits a string on a token into numerous substrings */
-void StringUtility::tokenize(CRstring str,
+void StringUtility::tokenise(CRstring str,
                       vector<string>& tokens,
                       CRstring delimiters)
 {
@@ -344,7 +378,7 @@ void StringUtility::tokenize(CRstring str,
     }
 }
 
-void StringUtility::tokenize(CRstring str,
+void StringUtility::tokenise(CRstring str,
                       vector<string>& tokens,
                       CRstring delimiters,
                       CRuint maxParts)
@@ -368,6 +402,15 @@ void StringUtility::tokenize(CRstring str,
     {
         tokens.push_back(str.substr(lastPos, str.size()-lastPos));
     }
+}
+
+void StringUtility::tokenize(CRstring str, vector<string>& tokens, CRstring delimiters)
+{
+    tokenise(str,tokens,delimiters);
+}
+void StringUtility::tokenize(CRstring str, vector<string>& tokens, CRstring delimiters, CRuint maxParts)
+{
+    tokenise(str,tokens,delimiters,maxParts);
 }
 
 // Combine a Tokenized vector back into a string

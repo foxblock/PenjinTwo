@@ -1,20 +1,20 @@
 /*
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <SDL/SDL_image.h>
@@ -22,6 +22,7 @@
 
 #include "Image.h"
 #include "GFX.h"
+#include "ErrorHandler.h"
 using Penjin::Image;
 
 
@@ -29,6 +30,7 @@ Image::Image() : surface(NULL)
 {
     setDrawWidth(1);
     setColour(MAGENTA);
+    fileName = "IMAGE";
    /* alpha = 255;
     #ifdef PENJIN_3D
         rotation.x = rotation.y = rotation.z = 0.0f;
@@ -58,6 +60,7 @@ void Image::clear()
     if(surface)
         SDL_FreeSurface(surface);
     surface = NULL;
+    fileName = "SURFACE";
 }
 
 void Image::render()
@@ -72,8 +75,8 @@ void Image::render()
         src.y = surface->clip_rect.y;
         src.w = surface->w;
         src.h = surface->h;
-        Renderer* gfx = GFX::getInstance();
-        if(gfx->getScaleMode() != smPRESCALE)
+        Renderer* gfx = GFX;
+        if(gfx->getScaleMode() == smNONE)
         {
             dst.x = position.x;
             dst.y = position.y;
@@ -85,7 +88,7 @@ void Image::render()
         }
 
 
-        SDL_BlitSurface(surface, &src, GFX::getInstance()->getSDLVideoSurface(), &dst);
+        SDL_BlitSurface(surface, &src, GFX_SDL_2D::getInstance()->getSDLVideoSurface(), &dst);
         #ifdef _DEBUG
             Rectangle::render();
         #endif
@@ -99,40 +102,85 @@ Penjin::ERRORS Image::load(SDL_Surface* s)
 {
     // If surface is invalid
     if(s == NULL)
+    {
+        ErrorMan::getInstance()->print(PENJIN_ERROR,"Image: Invalid Surface!");
         return PENJIN_ERROR;
+    }
+
 
     // Free already existing surface
     if(surface && (surface!=s))
         SDL_FreeSurface(surface);
     surface = s;
 
+    //  Set dimensions BEFORE rescaling!
+    setDimensions(surface->w,surface->h);
+
     // PRESCALE if needed.
-    Renderer* gfx = GFX::getInstance();
-    if(gfx->getScaleMode() == smPRESCALE)
+    Renderer* gfx = GFX;
+    SCALE_MODES m = gfx->getScaleMode();
+    if(m != smNONE)
     {
-        SDL_Surface* orig = surface;
-        surface = NULL;
-        Vector2d<float> sc = gfx->getPixelScale();
-        surface = zoomSurface(orig, sc.x, sc.y, SMOOTHING_OFF);
-        SDL_FreeSurface(orig);
+        if(m == smPOKESCALE)
+        {
+            Vector2d<float> sc = gfx->getPixelScale();
+            if (static_cast<int>(sc.x) == sc.x && sc.x == sc.y)
+            {
+                #ifdef _DEBUG
+                    ErrorMan::getInstance()->print("Pokescaling Image: " + fileName);
+                #endif
+                Surface* orig = new Surface;
+                orig->setSurface(surface);
+                Surface*t = gfx->pokeScale(orig,sc.x);
+                surface = NULL;
+                if(t)
+                {
+                    if(t->getSDL_Surface())
+                    {
+                        surface = t->getSDL_Surface();
+                        delete t;
+                    }
+                }
+                orig->clear();
+                delete orig;
+            }
+            else
+            {
+                ErrorMan::getInstance()->print(PENJIN_ERROR,"Scalefactor non-integer, Unable to PokeScale:" + fileName);
+                m = smPRESCALE;
+            }
+        }
+        if(m == smPRESCALE)
+        {
+            #ifdef _DEBUG
+            ErrorMan::getInstance()->print("Prescaling Image: " + fileName);
+            #endif
+            SDL_Surface* orig = surface;
+            surface = NULL;
+            Vector2d<float> sc = gfx->getPixelScale();
+            surface = zoomSurface(orig, sc.x, sc.y, SMOOTHING_OFF);
+            SDL_FreeSurface(orig);
+        }
+
+
 
         ///////////////
         // This code fixes colour keying in 32 bpp mode (otherwise the colour key colour shows)
         // It also caused the rotated images to disappear in 16 bpp mode, so only run for 32 bpp
-        /*if(surface->format->BitsPerPixel == 32)
+        if(surface->format->BitsPerPixel == 32)
         {
             SDL_Surface* another = SDL_CreateRGBSurface(surface->flags,surface->w, surface->h,surface->format->BitsPerPixel,
                                                         surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
             // default to magenta
-            SDL_FillRect(another, NULL, SDL_MapRGB(another->format,0,0,0));
-            SDL_SetColorKey(surface, NULL, surface->format->colorkey);
-            //SDL_SetColorKey(surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, NULL);//SDL_MapRGB(surface->format,0,0,0));
+            SDL_FillRect(another, NULL, SDL_MapRGB(another->format,255,0,255));
+            //SDL_SetColorKey(surface, NULL, surface->format->colorkey);
+            SDL_SetColorKey(surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, NULL);//SDL_MapRGB(surface->format,0,0,0));
             SDL_BlitSurface(surface,NULL, another, NULL);
-            //SDL_SetColorKey(another, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(another->format,255,0,255));
-            SDL_SetColorKey(another, NULL, another->format->colorkey);
+            SDL_SetColorKey(another, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(another->format,255,0,255));
+            //SDL_SetColorKey(another, NULL, another->format->colorkey);
             SDL_FreeSurface(surface);
             surface = another;
-        }*/
+        }
     }
 
     // Setup correct display format depending on if image contains alpha or not
@@ -143,11 +191,6 @@ Penjin::ERRORS Image::load(SDL_Surface* s)
         surface = SDL_DisplayFormat(surface);
 
     SDL_FreeSurface(oldSurface);
-
-    // update dimensions
-    dimensions.x = surface->w;
-    dimensions.y = surface->h;
-
     return PENJIN_OK;
 }
 
@@ -155,12 +198,12 @@ Penjin::ERRORS Image::load(const string& file)
 {
     fileName = file;
     SDL_Surface* t = IMG_Load(file.c_str());
-    Penjin::ERRORS e = Image::load(t);
-    return e;
+    return Image::load(t);
 }
 
 Penjin::ERRORS Image::save(const string& file)
 {
+    ErrorMan::getInstance()->print(PENJIN_FUNCTION_IS_STUB);
     return Penjin::PENJIN_FUNCTION_IS_STUB;
 }
 

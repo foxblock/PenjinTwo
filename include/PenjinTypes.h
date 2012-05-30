@@ -1,20 +1,20 @@
 /*
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #ifndef TYPES_H
 #define TYPES_H
@@ -32,17 +32,24 @@ typedef unsigned char uchar;
 //  VECTORS - Have length() operations and such
 #include "trenki/vector_math.h"
 #include "trenki/fixed_class.h"
-/*#include "Vector2df.h"
-class Vector2dx;
-#include "Vector2di.h"
-#include "Vector3df.h"
-class Vector3dx;//#include "Vector3dx.h"
-#include "Vector3di.h"*/
+typedef fixedpoint::fixed_point<16> Fixed;                      //  Default fixed point
+#include "Vector2d.h"
+using Penjin::Vector2d;
+typedef Vector2d<int> Vector2di;
+typedef Vector2d<float> Vector2df;
+typedef Vector2d<Fixed> Vector2dx;
+
+#include "Vector3d.h"
+using Penjin::Vector3d;
+typedef Vector3d<int> Vector3di;
+typedef Vector3d<float> Vector3df;
+typedef Vector3d<Fixed> Vector3dx;
+
 typedef vmath::vec4<int> Vector4di;                             //  int 4d vector
 typedef vmath::vec4<float> Vector4df;                           //  float 4d vector
 typedef vmath::vec4<fixedpoint::fixed_point<16> > Vector4dx;    //  Fixed point 4d vector
 
-typedef fixedpoint::fixed_point<16> Fixed;                      //  Default fixed point
+
 
 //  POINTS - simple spatial points
 struct Point2df{float x;float y;};

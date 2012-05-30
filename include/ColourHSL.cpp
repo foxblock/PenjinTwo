@@ -1,20 +1,20 @@
 /*
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "ColourHSL.h"
 using Penjin::ColourHSL;
@@ -77,8 +77,8 @@ void ColourHSL::setColour(const Colour& c)
             if(hue < 0)
                 hue+=255;
         #else
-            float maxC = max(c.red, max(c.green, c.blue));
-            float minC = min(c.red, min(c.green, c.blue));
+            float maxC = max(c.r, max(c.g, c.b));
+            float minC = min(c.r, min(c.g, c.b));
             lightness = (minC + maxC) *0.5f;
 
             if(lightness < 0.5f)
@@ -86,12 +86,12 @@ void ColourHSL::setColour(const Colour& c)
             else
                 saturation = (maxC - minC) / (2.0f - maxC - minC);
 
-            if(c.red == maxC)
-                hue = (c.green - c.blue) / (maxC - minC);
-            else if(c.green == maxC)
-                hue = 2.0f + (c.blue - c.red) / (maxC - minC);
+            if(c.r == maxC)
+                hue = (c.g - c.b) / (maxC - minC);
+            else if(c.g == maxC)
+                hue = 2.0f + (c.b - c.r) / (maxC - minC);
             else
-                hue = 4.0f + (c.red - c.green) / (maxC - minC);
+                hue = 4.0f + (c.r - c.g) / (maxC - minC);
 
             hue *= 0.666f;   //  Bring the hue within colour range
             if(hue < 0)

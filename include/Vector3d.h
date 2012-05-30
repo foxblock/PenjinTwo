@@ -2,25 +2,25 @@
 #define VECTOR3D_H_INCLUDED
 
 /*
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 /***************************************************************************************************
-*   \file CLASS_NAME is a bladiblabla that blah blah by blah.
+*   \file Vector3d is a 3D vector
 *   \author Kevin Winfield-Pantoja
 */
 #include "Vector2d.h"
@@ -51,11 +51,11 @@ namespace Penjin
                 return out;
             }
 
-            Vector3d<T> cross(const Vector3d<T> & v){return Vector3d<T>(y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x);}
+            Vector3d<T> cross(const Vector3d<T> & v){return Vector3d<T>(this->y*v.z - z*v.y, z*v.x - this->x*v.z, this->x*v.y - this->y*v.x);}
 
-            virtual float dot(const Vector3d<T>& v)const{return (this->x * v.x + this->y * v.y + z * v.z);}
-            virtual float lengthSquared()const          {return (this->x*this->x + this->y*this->y + z*z);}
-
+            virtual T dot(const Vector3d<T>& v)const{return (this->x * v.x + this->y * v.y + z * v.z);}
+            virtual T lengthSquared()const          {return (this->x*this->x + this->y*this->y + z*z);}
+            virtual T length()const                 {return sqrt(lengthSquared());}
             virtual Vector3d<T> unit()
             {
                 float len = length();

@@ -1,26 +1,26 @@
 /*
-	Penjin is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
+	PenjinTwo is Copyright (c)2005, 2006, 2007, 2008, 2009, 2010 Kevin Winfield-Pantoja
 
-	This file is part of Penjin.
+	This file is part of PenjinTwo.
 
-	Penjin is free software: you can redistribute it and/or modify
+	PenjinTwo is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Penjin is distributed in the hope that it will be useful,
+	PenjinTwo is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public License
-	along with Penjin.  If not, see <http://www.gnu.org/licenses/>.
+	along with PenjinTwo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #ifndef TEXT_H
 #define TEXT_H
-#if defined(PENJIN_SDL) || defined(PENJIN_GL) || defined(PENJIN_SOFT) || defined(PENJIN_ES) || defined(PENJIN_ES2)
+//#if defined(PENJIN_SDL) || defined(PENJIN_GL) || defined(PENJIN_SOFT) || defined(PENJIN_ES) || defined(PENJIN_ES2)
     #include "Glyph.h"
-#endif
+//#endif
 #include <string>
 #include "DoubleVector.h"
 #include <ctype.h>
@@ -29,9 +29,9 @@
 #endif
 using namespace std;
 #include "PenjinTypes.h"
-#include "Colour.h"
+//#include "Colour.h"
 #include "Errors.h"
-
+#include "Singleton.h"
 ///Text will wrap after 58 characters, inc spaces and punctuation. (at size 12 pt) (on a GP2X screen, 320x240)
 ///The text below shows how many characters can be used before the text will wrap.
 ////////////////////////////////////////////////////////////////////////////////////
@@ -55,12 +55,14 @@ namespace Penjin
     }
 
     using namespace TextClass;
+    class Colour;
 
     class Text : public Rectangle, public FileObject
     {
         public:
             Text();		//	Initialise font handling
             virtual ~Text();	//	Shutdown font handling
+            //static Text* getInstance();
 
             Penjin::ERRORS load(CRstring fontName,CRuint fontSize);		//	Loads a TTF
             Penjin::ERRORS load(CRstring fontName);  // Load a TTF without changing size
@@ -74,8 +76,8 @@ namespace Penjin
             //  Sets the starting position of the text
 
 
-            void setBgColour(const Colour& col){bgColour = col;setRenderMode(GlyphClass::BOXED);}
-            Colour getBgColour()const{return bgColour;}
+            void setBgColour(const Colour& col){*bgColour = col;setRenderMode(GlyphClass::BOXED);}
+            Colour getBgColour()const{return *bgColour;}
 
             void setWrapping(CRbool shouldWrap){wrapText = shouldWrap;}
             bool getWrapping()const{return wrapText;}
@@ -90,8 +92,8 @@ namespace Penjin
             /** \brief Get the dimensions of the str*/
             Vector2d<int> getDimensions(CRstring str);
 
-            Vector2d<int> getCursorPosition()const{return cursorPos;}
-            void setCursorPosition(const Vector2d<int> p){cursorPos = p;}
+            Vector2d<int> getCursorPosition()const{return cursorPos.getPosition();}
+            void setCursorPosition(const Vector2d<int> p){cursorPos.setPosition(p);}
 
 
 
@@ -117,7 +119,9 @@ namespace Penjin
             TTF_Font* font;
             string fontName;
             uint fontSize;
-            Vector2d<int> cursorPos;
+            PositionObject cursorPos;
+            // Printable area for text.
+            DimensionObject textBox;
 
 
             #ifdef PENJIN_SDL
@@ -129,8 +133,13 @@ namespace Penjin
             bool wrapText;
             ALIGNMENT alignment;
 
-            Colour bgColour;
+            Colour* bgColour;
+
+            //static Text* instance;
     };
+
+    typedef Singleton<Text> TextMan;
+    //typedef Text TextMan;
 }
 
 #endif	//	TEXT_H
